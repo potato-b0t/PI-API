@@ -38,7 +38,7 @@ async function fillDB() {
 
   //get pokemon from api
 
-  const apiResult = await axios.get("https://pokeapi.co/api/v2/pokemon/?limit=1281")
+  const apiResult = await axios.get("https://pokeapi.co/api/v2/pokemon/?limit=300")
 
   await apiResult.data.results.forEach(async (Poke) => {
     try {
