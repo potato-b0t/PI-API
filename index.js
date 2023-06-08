@@ -40,54 +40,35 @@ async function fillDB() {
 
   const apiResult = await axios.get("https://pokeapi.co/api/v2/pokemon/?limit=1281")
 
-  apiResult.data.results.forEach(async (Poke) => {
-    const pokemon = await axios.get(`https://pokeapi.co/api/v2/pokemon/${Poke.name}`)
+  await apiResult.data.results.forEach(async (Poke) => {
+    try {
+      const pokemon = await axios.get(`https://pokeapi.co/api/v2/pokemon/${Poke.name}`)
 
-    if (pokemon.data.sprites.front_default) {
-      const pokemonCreated = await Pokemon.create({
-        id: pokemon.data.id,
-        name: pokemon.data.name,
-        Image: pokemon.data.sprites.front_default,
-        Life: pokemon.data.stats[0].base_stat,
-        Attack: pokemon.data.stats[1].base_stat,
-        Defense: pokemon.data.stats[2].base_stat,
-        speed: pokemon.data.stats[5].base_stat
-      })
-
-      /*pokemon.data.types.forEach(async type => {
-        const typeid = await Type.findOne({ where: { name: type.type.name } })
-  
-        await Pokemontype.create({
-          pokeID: pokemonCreated.ID,
-          typeID: typeid.ID
+      if (pokemon.data.sprites.front_default) {
+        const pokemonCreated = await Pokemon.create({
+          id: pokemon.data.id,
+          name: pokemon.data.name,
+          Image: pokemon.data.sprites.front_default,
+          Life: pokemon.data.stats[0].base_stat,
+          Attack: pokemon.data.stats[1].base_stat,
+          Defense: pokemon.data.stats[2].base_stat,
+          speed: pokemon.data.stats[5].base_stat
         })
-      })*/
-      if (pokemon.data.types.length > 1) {
 
         for (let types of pokemon.data.types) {
 
-          //console.log(types.type.name)
-          const typeid = await Type.findOne({ where: { name: types.type.name } })
-
-          console.log(typeid.id)
-
-          await Pokemontype.create({
-            pokeID: pokemonCreated.id,
-            typeID: typeid.id
-          })
+          await Type.findOne({ where: { name: types.type.name } }).then(async response => await Pokemontype.create({ pokemonId: pokemonCreated.id, typeId: response.id }))
 
         }
-      } else {
-        const typeid = await Type.findOne({ where: { name: pokemon.data.types[0].type.name } })
-        await Pokemontype.create({
-          pokeID: pokemonCreated.id,
-          typeID: typeid.id
-          })
+
       }
+    }
+    catch (err) {
 
     }
 
   })
+  console.log("DB Filled")
 
 }
 

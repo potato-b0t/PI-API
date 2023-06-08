@@ -2,18 +2,13 @@ const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
 
-    const PokemonXType = sequelize.define('pokemontype', {
-        id: {
-            type: DataTypes.INTEGER,
-            autoIncrement: true,
-            allowNull: false,
-            primaryKey: true
-        },
-        pokeID: {
+    const pokemontypemodel = sequelize.define('pokemontype', {
+
+        pokemonId: {
             type: DataTypes.INTEGER(),
             allowNull: false
         },
-        typeID: {
+        typeId: {
             type: DataTypes.INTEGER(),
             allowNull: false
         }
@@ -21,5 +16,5 @@ module.exports = (sequelize) => {
 
     }
     )
-    
+
 }
