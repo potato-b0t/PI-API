@@ -1,4 +1,5 @@
 const { Pokemon, Type, Pokemontype } = require("../db")
+const axios = require("axios")
 
 module.exports = {
     GetPokemons: async (req, res) => {
@@ -40,10 +41,25 @@ module.exports = {
                     typesID
                 }
                 return res.status(200).json(pokemon)
+            } else {
+                pokemon = await axios.get(`https://pokeapi.co/api/v2/pokemon/${id}`).data
+                let pokemonWithData = {
+                    id: pokemon.id, name: pokemon.name, Image: pokemon.sprites.front_default, Life: pokemon.stats[0], Attack: pokemon.data.stats[1].base_stat,
+          Defense: pokemon.data.stats[2].base_stat,
+          speed: pokemon.data.stats[5].base_stat
+                }
+                let typesID = []
+
+                for (let type of pokemon.types) typesID.push(await Type.findOne({where: {id: type.type.name}}))
+
+                pokemon = {
+                    ...pokemon,
+                    typesID
+                }
             }
         } catch (error) {
             return res.status(500).json(error)
-        }
+        } 
     },
     CreatePokemon: async (req, res) => {
         const { id, name, image, Life, Attack, Defense, speed, types } = req.body
